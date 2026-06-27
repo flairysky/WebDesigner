@@ -579,7 +579,11 @@ footer {
 .footer-nav { display: flex; gap: 2rem; flex-wrap: wrap; justify-content: center; }
 .footer-nav a { font-size: 0.84rem; color: var(--muted); transition: color var(--ease); }
 .footer-nav a:hover { color: var(--text); }
+.footer-bottom { display: flex; flex-direction: column; align-items: center; gap: 0.6rem; }
 .footer-copy { font-size: 0.78rem; color: var(--dim); }
+.footer-legal { display: flex; gap: 1.4rem; flex-wrap: wrap; justify-content: center; }
+.footer-legal a { font-size: 0.78rem; color: var(--dim); transition: color var(--ease); }
+.footer-legal a:hover { color: var(--muted); }
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 960px) {
