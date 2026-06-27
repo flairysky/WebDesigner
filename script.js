@@ -1,67 +1,110 @@
-/* ===== PARTICLES ===== */
-(function initParticles() {
+/* ===== OCEAN BACKGROUND ===== */
+(function initOcean() {
   const canvas = document.getElementById('particleCanvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
-  let w, h, particles = [];
-  const COUNT = 90, CONNECT = 130, SPEED = 0.35;
+  let w, h;
 
   function resize() {
-    w = canvas.width  = canvas.offsetWidth;
+    w = canvas.width = canvas.offsetWidth;
     h = canvas.height = canvas.offsetHeight;
   }
 
-  function Particle() {
-    this.reset = () => {
-      this.x  = Math.random() * w;
-      this.y  = Math.random() * h;
-      this.vx = (Math.random() - 0.5) * SPEED;
-      this.vy = (Math.random() - 0.5) * SPEED;
-      this.r  = Math.random() * 1.8 + 0.4;
-      this.o  = Math.random() * 0.45 + 0.1;
+  const bubbles = [];
+  const plankton = [];
+
+  function newBubble(fromBottom) {
+    return {
+      x: Math.random() * w,
+      y: fromBottom ? h + 20 : Math.random() * h,
+      r: Math.random() * 2.5 + 0.7,
+      vy: -(Math.random() * 0.42 + 0.12),
+      wobble: Math.random() * Math.PI * 2,
+      ws: Math.random() * 0.02 + 0.008,
+      wa: Math.random() * 0.4 + 0.12,
+      o: Math.random() * 0.38 + 0.14,
     };
-    this.reset();
-    this.update = () => {
-      this.x += this.vx;
-      this.y += this.vy;
-      if (this.x < 0 || this.x > w) this.vx *= -1;
-      if (this.y < 0 || this.y > h) this.vy *= -1;
-    };
-    this.draw = () => {
-      ctx.beginPath();
-      ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(123,97,255,${this.o})`;
-      ctx.fill();
+  }
+
+  function newPlankton() {
+    const roll = Math.random();
+    return {
+      x: Math.random() * w,
+      y: Math.random() * h,
+      r: Math.random() * 1.0 + 0.3,
+      vx: (Math.random() - 0.5) * 0.15,
+      vy: (Math.random() - 0.5) * 0.1,
+      phase: Math.random() * Math.PI * 2,
+      rgb: roll > 0.55 ? '65,155,255' : roll > 0.3 ? '105,75,240' : '25,195,215',
+      bo: Math.random() * 0.38 + 0.08,
     };
   }
 
   function init() {
-    particles = Array.from({ length: COUNT }, () => new Particle());
+    bubbles.length = 0;
+    plankton.length = 0;
+    for (let i = 0; i < 65; i++) bubbles.push(newBubble(false));
+    for (let i = 0; i < 55; i++) plankton.push(newPlankton());
   }
 
-  function connect() {
-    for (let i = 0; i < particles.length; i++) {
-      for (let j = i + 1; j < particles.length; j++) {
-        const dx = particles[i].x - particles[j].x;
-        const dy = particles[i].y - particles[j].y;
-        const d  = Math.sqrt(dx * dx + dy * dy);
-        if (d < CONNECT) {
-          const a = (1 - d / CONNECT) * 0.25;
-          ctx.beginPath();
-          ctx.moveTo(particles[i].x, particles[i].y);
-          ctx.lineTo(particles[j].x, particles[j].y);
-          ctx.strokeStyle = `rgba(123,97,255,${a})`;
-          ctx.lineWidth = 0.6;
-          ctx.stroke();
-        }
-      }
-    }
-  }
+  let t = 0;
 
   function loop() {
+    t++;
     ctx.clearRect(0, 0, w, h);
-    particles.forEach(p => { p.update(); p.draw(); });
-    connect();
+
+    // Subtle crepuscular light rays from above
+    for (let i = 0; i < 7; i++) {
+      const cx = w * ((i + 0.5) / 7) + Math.sin(t * 0.00035 + i * 1.25) * 55;
+      const sw = w * 0.048 + Math.sin(t * 0.00028 + i * 0.9) * 11;
+      const alpha = 0.022 + Math.sin(t * 0.0005 + i) * 0.01;
+      const g = ctx.createLinearGradient(cx, 0, cx, h * 0.72);
+      g.addColorStop(0, `rgba(55,135,225,${alpha})`);
+      g.addColorStop(1, 'rgba(55,135,225,0)');
+      ctx.beginPath();
+      ctx.moveTo(cx - sw, 0);
+      ctx.lineTo(cx + sw, 0);
+      ctx.lineTo(cx + sw * 3, h * 0.72);
+      ctx.lineTo(cx - sw * 3, h * 0.72);
+      ctx.closePath();
+      ctx.fillStyle = g;
+      ctx.fill();
+    }
+
+    // Rising bubbles
+    for (const b of bubbles) {
+      b.wobble += b.ws;
+      b.x += Math.sin(b.wobble) * b.wa;
+      b.y += b.vy;
+      if (b.y < -12) Object.assign(b, newBubble(true));
+
+      ctx.beginPath();
+      ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(140,210,255,${b.o})`;
+      ctx.lineWidth = 1.0;
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(b.x - b.r * 0.27, b.y - b.r * 0.3, b.r * 0.28, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(215,242,255,${b.o * 0.85})`;
+      ctx.fill();
+    }
+
+    // Bioluminescent plankton
+    ctx.save();
+    for (const p of plankton) {
+      p.x = (p.x + p.vx + w) % w;
+      p.y = (p.y + p.vy + h) % h;
+      const a = p.bo * (0.42 + 0.58 * Math.sin(t * 0.013 + p.phase));
+      ctx.shadowBlur = 5;
+      ctx.shadowColor = `rgba(${p.rgb},0.85)`;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${p.rgb},${a})`;
+      ctx.fill();
+    }
+    ctx.shadowBlur = 0;
+    ctx.restore();
+
     requestAnimationFrame(loop);
   }
 
@@ -157,40 +200,161 @@
 })();
 
 
-/* ===== CUSTOM CURSOR ===== */
-(function initCursor() {
+/* ===== JELLYFISH CURSOR ===== */
+(function initJellyfish() {
+  if ('ontouchstart' in window) return;
+
   const dot  = document.getElementById('cursor');
   const ring = document.getElementById('cursorRing');
-  if (!dot || !ring) return;
-
-  if ('ontouchstart' in window) {
-    dot.style.display  = 'none';
-    ring.style.display = 'none';
-    return;
-  }
-
+  if (dot)  dot.style.display  = 'none';
+  if (ring) ring.style.display = 'none';
   document.body.style.cursor = 'none';
 
-  let mx = 0, my = 0, rx = 0, ry = 0;
+  const cv = document.createElement('canvas');
+  cv.style.cssText = 'position:fixed;top:0;left:0;pointer-events:none;z-index:9999;';
+  document.body.appendChild(cv);
+  const ctx = cv.getContext('2d');
 
-  document.addEventListener('mousemove', e => {
-    mx = e.clientX; my = e.clientY;
-    dot.style.left = mx + 'px';
-    dot.style.top  = my + 'px';
-  });
+  function resize() { cv.width = window.innerWidth; cv.height = window.innerHeight; }
+  resize();
+  window.addEventListener('resize', resize);
 
-  (function chase() {
-    rx += (mx - rx) * 0.13;
-    ry += (my - ry) * 0.13;
-    ring.style.left = rx + 'px';
-    ring.style.top  = ry + 'px';
-    requestAnimationFrame(chase);
-  })();
+  let mx = window.innerWidth / 2, my = window.innerHeight / 2;
+  let jx = mx, jy = my;
+  let ang = -Math.PI / 2; // starts facing up
+  let hovering = false;
+  let t = 0;
+
+  document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
 
   document.querySelectorAll('a, button, .project-card').forEach(el => {
-    el.addEventListener('mouseenter', () => ring.classList.add('grow'));
-    el.addEventListener('mouseleave', () => ring.classList.remove('grow'));
+    el.addEventListener('mouseenter', () => hovering = true);
+    el.addEventListener('mouseleave', () => hovering = false);
   });
+
+  const BW = 20; // bell half-width
+  const BH = 13; // bell height
+  const NT = 8;  // tentacle count
+
+  function drawJelly(x, y, pulse) {
+    const sc = hovering ? 1.35 : 1;
+    const bw = BW * sc * (1 + pulse * 0.1);
+    const bh = BH * sc * (1 - pulse * 0.05);
+    const bob = Math.sin(t * 0.038) * 1.4;
+
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(ang);
+    ctx.translate(bob, 0); // perpendicular drift relative to swimming direction
+
+    // Outer bioluminescent halo
+    const haloAlpha = hovering ? 0.26 : 0.17;
+    const halo = ctx.createRadialGradient(0, 0, 0, 0, bh * 0.5, bw * 3.0);
+    halo.addColorStop(0, `rgba(80,150,255,${haloAlpha})`);
+    halo.addColorStop(0.5, `rgba(100,80,255,${haloAlpha * 0.38})`);
+    halo.addColorStop(1, 'rgba(60,100,255,0)');
+    ctx.beginPath();
+    ctx.ellipse(0, bh * 0.5, bw * 2.5, bh * 4, 0, 0, Math.PI * 2);
+    ctx.fillStyle = halo;
+    ctx.fill();
+
+    // Tentacles trailing behind the bell
+    for (let i = 0; i < NT; i++) {
+      const f = i / (NT - 1);
+      const tx = (f - 0.5) * bw * 1.7;
+      const len = 25 + Math.sin(i * 2.0) * 7;
+      ctx.beginPath();
+      ctx.moveTo(tx, bh * 0.5);
+      for (let s = 1; s <= 12; s++) {
+        const sy = bh * 0.5 + len * s / 12;
+        const sx = tx + Math.sin(t * 0.044 + i * 0.88 + s * 0.37) * (2 + pulse * 1.8);
+        ctx.lineTo(sx, sy);
+      }
+      const a = (0.16 + 0.12 * Math.sin(t * 0.028 + i * 0.65)) * sc;
+      ctx.strokeStyle = `rgba(100,185,255,${a})`;
+      ctx.lineWidth = 0.7;
+      ctx.stroke();
+    }
+
+    // Bell body
+    ctx.beginPath();
+    ctx.moveTo(-bw, 0);
+    ctx.bezierCurveTo(-bw, -bh * 1.8, bw, -bh * 1.8, bw, 0);
+    ctx.bezierCurveTo(bw * 0.75, bh * 0.52, -bw * 0.75, bh * 0.52, -bw, 0);
+    ctx.closePath();
+
+    const bg = ctx.createRadialGradient(-bw * 0.17, -bh * 0.42, 0, 0, -bh * 0.12, bw * 1.12);
+    bg.addColorStop(0, 'rgba(215,232,255,0.8)');
+    bg.addColorStop(0.28, 'rgba(105,158,255,0.6)');
+    bg.addColorStop(0.62, 'rgba(78,105,228,0.38)');
+    bg.addColorStop(1, 'rgba(55,78,195,0.1)');
+    ctx.fillStyle = bg;
+    ctx.fill();
+
+    // Rim glow
+    ctx.beginPath();
+    ctx.ellipse(0, 0, bw, bh * 0.19, 0, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(145,215,255,${hovering ? 0.38 : 0.25})`;
+    ctx.fill();
+
+    // Radial canals (inner detail)
+    ctx.save();
+    ctx.globalAlpha = 0.4;
+    for (let i = 0; i < 4; i++) {
+      const a = (i / 4) * Math.PI * 2;
+      ctx.beginPath();
+      ctx.moveTo(0, -bh * 0.07);
+      ctx.quadraticCurveTo(
+        Math.cos(a) * bw * 0.3,  Math.sin(a) * bh * 0.3  - bh * 0.27,
+        Math.cos(a) * bw * 0.44, Math.sin(a) * bh * 0.44 - bh * 0.44
+      );
+      ctx.strokeStyle = 'rgba(165,220,255,0.5)';
+      ctx.lineWidth = 0.5;
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    ctx.restore();
+  }
+
+  function drawCursorDot(x, y) {
+    ctx.save();
+    ctx.shadowBlur = 14;
+    ctx.shadowColor = 'rgba(210,235,255,0.9)';
+    ctx.beginPath();
+    ctx.arc(x, y, 3, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(240,250,255,0.96)';
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.restore();
+  }
+
+  function loop() {
+    t++;
+    ctx.clearRect(0, 0, cv.width, cv.height);
+
+    // Lag-chase toward white cursor dot
+    jx += (mx - jx) * 0.09;
+    jy += (my - jy) * 0.09;
+
+    // Smooth rotation so bell faces the white dot
+    const dx = mx - jx, dy = my - jy;
+    if (Math.sqrt(dx * dx + dy * dy) > 4) {
+      let target = Math.atan2(dy, dx) + Math.PI / 2;
+      let diff = target - ang;
+      while (diff > Math.PI)  diff -= Math.PI * 2;
+      while (diff < -Math.PI) diff += Math.PI * 2;
+      ang += diff * 0.08;
+    }
+
+    const pulse = Math.sin(t * 0.054) * 0.5 + 0.5;
+    drawJelly(jx, jy, pulse);
+    drawCursorDot(mx, my);
+
+    requestAnimationFrame(loop);
+  }
+
+  loop();
 })();
 
 
