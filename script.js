@@ -333,19 +333,22 @@
     t++;
     ctx.clearRect(0, 0, cv.width, cv.height);
 
-    // Lag-chase toward white cursor dot
-    jx += (mx - jx) * 0.09;
-    jy += (my - jy) * 0.09;
-
-    // Smooth rotation so bell faces the white dot
+    // Rotate toward the white dot first (using current center position)
     const dx = mx - jx, dy = my - jy;
-    if (Math.sqrt(dx * dx + dy * dy) > 4) {
+    if (Math.sqrt(dx * dx + dy * dy) > 2) {
       let target = Math.atan2(dy, dx) + Math.PI / 2;
       let diff = target - ang;
       while (diff > Math.PI)  diff -= Math.PI * 2;
       while (diff < -Math.PI) diff += Math.PI * 2;
       ang += diff * 0.08;
     }
+
+    // Chase so the bell apex lands on the white dot, not the center
+    const APEX = BH * 1.8;
+    const targetX = mx - APEX * Math.sin(ang);
+    const targetY = my + APEX * Math.cos(ang);
+    jx += (targetX - jx) * 0.09;
+    jy += (targetY - jy) * 0.09;
 
     const pulse = Math.sin(t * 0.054) * 0.5 + 0.5;
     drawJelly(jx, jy, pulse);
