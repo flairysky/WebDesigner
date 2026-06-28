@@ -426,3 +426,43 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
     }
   });
 });
+
+/* ===== COOKIE CONSENT & MICROSOFT CLARITY ===== */
+(function initCookieConsent() {
+  function loadClarity() {
+    (function(c,l,a,r,i,t,y){
+      c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+      t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+      y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "xe32t6hxx2");
+  }
+
+  var banner = document.getElementById('cookieBanner');
+  var acceptBtn = document.getElementById('cookieAccept');
+  var rejectBtn = document.getElementById('cookieReject');
+  var consent = localStorage.getItem('cookieConsent');
+
+  if (consent === 'accepted') {
+    loadClarity();
+    if (banner) banner.classList.add('hidden');
+    return;
+  }
+
+  if (consent === 'rejected') {
+    if (banner) banner.classList.add('hidden');
+    return;
+  }
+
+  if (!banner) return;
+
+  acceptBtn.addEventListener('click', function () {
+    localStorage.setItem('cookieConsent', 'accepted');
+    banner.classList.add('hidden');
+    loadClarity();
+  });
+
+  rejectBtn.addEventListener('click', function () {
+    localStorage.setItem('cookieConsent', 'rejected');
+    banner.classList.add('hidden');
+  });
+})();
