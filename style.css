@@ -768,26 +768,59 @@ footer {
 /* Glowy team member card */
 .glowy-member-card {
   margin-top: 1.8rem;
-  border: 1px solid var(--card-bd);
+  border: 1.5px solid rgba(6,182,212,0.28);
+  border-top: 2px solid rgba(120,230,255,0.5);
   border-radius: 16px;
   padding: 1.4rem 1.2rem 1.2rem;
-  background: var(--card-bg);
-  transition: border-color 0.4s ease, background 0.4s ease, box-shadow 0.4s ease;
+  background: linear-gradient(180deg, #01131f 0%, #011828 55%, #010e1c 100%);
+  transition: border-color 0.4s ease, box-shadow 0.4s ease;
   position: relative;
   overflow: hidden;
   text-align: center;
+  box-shadow:
+    inset 0 0 70px rgba(0,18,45,0.75),
+    inset 0 28px 55px rgba(1,38,75,0.35),
+    inset 2px 0 0 rgba(255,255,255,0.03),
+    0 8px 36px rgba(0,0,0,0.55),
+    0 0 0 1px rgba(6,182,212,0.07);
 }
 .glowy-member-card::before {
   content: '';
   position: absolute; inset: 0;
-  background: radial-gradient(ellipse 70% 55% at 50% 25%, rgba(6,182,212,0.06) 0%, transparent 70%);
+  background:
+    radial-gradient(ellipse 55% 28% at 20% 8%, rgba(100,220,255,0.11) 0%, transparent 60%),
+    radial-gradient(ellipse 45% 22% at 78% 6%, rgba(6,182,212,0.09) 0%, transparent 55%),
+    radial-gradient(ellipse 35% 18% at 50% 4%, rgba(150,240,255,0.07) 0%, transparent 50%);
   pointer-events: none;
-  transition: opacity 0.4s;
+  animation: aquaCaustic 6s ease-in-out infinite alternate;
+}
+.glowy-member-card::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(100,220,255,0.3) 15%,
+    rgba(6,182,212,0.65) 40%,
+    rgba(180,245,255,0.85) 50%,
+    rgba(6,182,212,0.65) 60%,
+    rgba(100,220,255,0.3) 85%,
+    transparent 100%
+  );
+  filter: blur(0.5px);
+  animation: waterSurface 3.5s ease-in-out infinite;
+  pointer-events: none;
 }
 .glowy-member-card:hover {
-  border-color: rgba(6,182,212,0.35);
-  background: rgba(6,182,212,0.04);
-  box-shadow: 0 0 36px rgba(6,182,212,0.09), inset 0 0 24px rgba(6,182,212,0.04);
+  border-color: rgba(6,182,212,0.5);
+  border-top-color: rgba(180,245,255,0.72);
+  box-shadow:
+    inset 0 0 70px rgba(0,18,45,0.7),
+    inset 0 28px 55px rgba(1,38,75,0.3),
+    inset 2px 0 0 rgba(255,255,255,0.03),
+    0 0 44px rgba(6,182,212,0.14),
+    0 10px 42px rgba(0,0,0,0.5);
 }
 .glowy-member-art {
   display: flex;
@@ -835,6 +868,34 @@ footer {
 .glowy-member-card:hover .g-tail-5 { animation-delay: 0.28s; }
 .glowy-member-card:hover .g-tail-6 { animation-delay: 0.35s; }
 .glowy-member-card:hover .g-tail-7 { animation-delay: 0.42s; }
+@keyframes aquaCaustic {
+  0%   { transform: translateX(0) scale(1); opacity: 0.8; }
+  33%  { transform: translateX(5px) scale(1.03); opacity: 1; }
+  66%  { transform: translateX(-4px) scale(0.97); opacity: 0.85; }
+  100% { transform: translateX(7px) scale(1.04); opacity: 0.92; }
+}
+@keyframes waterSurface {
+  0%, 100% { transform: scaleX(1) translateX(0); opacity: 0.7; }
+  33%  { transform: scaleX(0.95) translateX(4px); opacity: 1; }
+  66%  { transform: scaleX(1.05) translateX(-3px); opacity: 0.8; }
+}
+.aqua-bubble {
+  position: absolute;
+  bottom: -10px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 28%, rgba(255,255,255,0.55), rgba(6,182,212,0.12) 60%, transparent);
+  border: 1px solid rgba(100,220,255,0.28);
+  pointer-events: none;
+  z-index: 2;
+  animation: bubbleRise linear forwards;
+}
+@keyframes bubbleRise {
+  0%   { transform: translateY(0) translateX(0); opacity: 0; }
+  8%   { opacity: 0.7; }
+  45%  { transform: translateY(-120px) translateX(7px); opacity: 0.6; }
+  90%  { opacity: 0.35; }
+  100% { transform: translateY(-290px) translateX(-5px); opacity: 0; }
+}
 .glowy-member-desc {
   font-size: 0.76rem !important;
   margin-top: 0.7rem !important;

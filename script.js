@@ -395,6 +395,27 @@
 })();
 
 
+/* ===== AQUARIUM BUBBLES ===== */
+(function initAquaBubbles() {
+  const card = document.getElementById('glowCard');
+  if (!card) return;
+
+  function spawnBubble() {
+    const b = document.createElement('span');
+    b.className = 'aqua-bubble';
+    const size = 3 + Math.random() * 6;
+    const left = 8 + Math.random() * 84;
+    const duration = 3 + Math.random() * 3.5;
+    b.style.cssText = `width:${size}px;height:${size}px;left:${left}%;animation-duration:${duration}s`;
+    card.appendChild(b);
+    setTimeout(() => b.remove(), (duration + 0.6) * 1000);
+  }
+
+  for (let i = 0; i < 3; i++) setTimeout(() => spawnBubble(), i * 800);
+  setInterval(spawnBubble, 950);
+})();
+
+
 /* ===== SMOOTH SCROLL ===== */
 document.querySelectorAll('a[href^="#"]').forEach(a => {
   a.addEventListener('click', e => {
