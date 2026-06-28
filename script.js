@@ -223,6 +223,8 @@
   let jx = mx, jy = my;
   let ang = -Math.PI / 2; // starts facing up
   let hovering = false;
+  let glowCard = false;
+  let glowT = 0;
   let t = 0;
 
   document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
@@ -232,9 +234,19 @@
     el.addEventListener('mouseleave', () => hovering = false);
   });
 
+  const glowCardEl = document.getElementById('glowCard');
+  if (glowCardEl) {
+    glowCardEl.addEventListener('mouseenter', () => { glowCard = true; });
+    glowCardEl.addEventListener('mouseleave', () => { glowCard = false; });
+  }
+
   const BW = 20; // bell half-width
   const BH = 13; // bell height
   const NT = 8;  // tentacle count
+
+  function lerp3(r1, g1, b1, r2, g2, b2, t) {
+    return `${Math.round(r1 + (r2 - r1) * t)},${Math.round(g1 + (g2 - g1) * t)},${Math.round(b1 + (b2 - b1) * t)}`;
+  }
 
   function drawJelly(x, y, pulse) {
     const sc = hovering ? 1.35 : 1;
@@ -247,12 +259,27 @@
     ctx.rotate(ang);
     ctx.translate(bob, 0); // perpendicular drift relative to swimming direction
 
+    // Pulsing outer ring when glowing for Glowy card
+    if (glowT > 0) {
+      const ringPulse = (Math.sin(t * 0.06) * 0.5 + 0.5) * glowT;
+      const ring = ctx.createRadialGradient(0, bh * 0.5, 0, 0, bh * 0.5, bw * 5.5);
+      ring.addColorStop(0,    `rgba(6,182,212,${0.18 * ringPulse})`);
+      ring.addColorStop(0.45, `rgba(6,182,212,${0.10 * ringPulse})`);
+      ring.addColorStop(1,    'rgba(6,182,212,0)');
+      ctx.beginPath();
+      ctx.ellipse(0, bh * 0.5, bw * 5, bh * 7, 0, 0, Math.PI * 2);
+      ctx.fillStyle = ring;
+      ctx.fill();
+    }
+
     // Outer bioluminescent halo
-    const haloAlpha = hovering ? 0.26 : 0.17;
+    const haloAlpha = (hovering ? 0.26 : 0.17) + glowT * 0.38;
+    const haloC1 = lerp3(80, 150, 255,  6, 182, 212, glowT);
+    const haloC2 = lerp3(100, 80, 255,  6, 182, 212, glowT);
     const halo = ctx.createRadialGradient(0, 0, 0, 0, bh * 0.5, bw * 3.0);
-    halo.addColorStop(0, `rgba(80,150,255,${haloAlpha})`);
-    halo.addColorStop(0.5, `rgba(100,80,255,${haloAlpha * 0.38})`);
-    halo.addColorStop(1, 'rgba(60,100,255,0)');
+    halo.addColorStop(0,   `rgba(${haloC1},${haloAlpha})`);
+    halo.addColorStop(0.5, `rgba(${haloC2},${haloAlpha * 0.38})`);
+    halo.addColorStop(1,   `rgba(${haloC1},0)`);
     ctx.beginPath();
     ctx.ellipse(0, bh * 0.5, bw * 2.5, bh * 4, 0, 0, Math.PI * 2);
     ctx.fillStyle = halo;
@@ -270,9 +297,11 @@
         const sx = tx + Math.sin(t * 0.044 + i * 0.88 + s * 0.37) * (2 + pulse * 1.8);
         ctx.lineTo(sx, sy);
       }
-      const a = (0.16 + 0.12 * Math.sin(t * 0.028 + i * 0.65)) * sc;
-      ctx.strokeStyle = `rgba(100,185,255,${a})`;
-      ctx.lineWidth = 0.7;
+      const baseTA = 0.16 + glowT * 0.29;
+      const a = (baseTA + 0.12 * Math.sin(t * 0.028 + i * 0.65)) * sc;
+      const tC = lerp3(100, 185, 255, 6, 182, 212, glowT);
+      ctx.strokeStyle = `rgba(${tC},${a})`;
+      ctx.lineWidth = 0.7 + glowT * 0.4;
       ctx.stroke();
     }
 
@@ -284,22 +313,24 @@
     ctx.closePath();
 
     const bg = ctx.createRadialGradient(-bw * 0.17, -bh * 0.42, 0, 0, -bh * 0.12, bw * 1.12);
-    bg.addColorStop(0, 'rgba(215,232,255,0.8)');
-    bg.addColorStop(0.28, 'rgba(105,158,255,0.6)');
-    bg.addColorStop(0.62, 'rgba(78,105,228,0.38)');
-    bg.addColorStop(1, 'rgba(55,78,195,0.1)');
+    bg.addColorStop(0,    `rgba(${lerp3(215,232,255, 220,255,255, glowT)},${0.8 + glowT * 0.12})`);
+    bg.addColorStop(0.28, `rgba(${lerp3(105,158,255,   6,182,212, glowT)},${0.6 + glowT * 0.15})`);
+    bg.addColorStop(0.62, `rgba(${lerp3( 78,105,228,   0,140,160, glowT)},${0.38 + glowT * 0.07})`);
+    bg.addColorStop(1,    `rgba(${lerp3( 55, 78,195,   0,100,120, glowT)},0.1)`);
     ctx.fillStyle = bg;
     ctx.fill();
 
     // Rim glow
     ctx.beginPath();
     ctx.ellipse(0, 0, bw, bh * 0.19, 0, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(145,215,255,${hovering ? 0.38 : 0.25})`;
+    const rimAlpha = (hovering ? 0.38 : 0.25) + glowT * 0.32;
+    const rimC = lerp3(145, 215, 255, 180, 255, 255, glowT);
+    ctx.fillStyle = `rgba(${rimC},${rimAlpha})`;
     ctx.fill();
 
     // Radial canals (inner detail)
     ctx.save();
-    ctx.globalAlpha = 0.4;
+    ctx.globalAlpha = 0.4 + glowT * 0.25;
     for (let i = 0; i < 4; i++) {
       const a = (i / 4) * Math.PI * 2;
       ctx.beginPath();
@@ -308,7 +339,8 @@
         Math.cos(a) * bw * 0.3,  Math.sin(a) * bh * 0.3  - bh * 0.27,
         Math.cos(a) * bw * 0.44, Math.sin(a) * bh * 0.44 - bh * 0.44
       );
-      ctx.strokeStyle = 'rgba(165,220,255,0.5)';
+      const cC = lerp3(165, 220, 255, 180, 255, 255, glowT);
+      ctx.strokeStyle = `rgba(${cC},0.5)`;
       ctx.lineWidth = 0.5;
       ctx.stroke();
     }
@@ -331,6 +363,8 @@
 
   function loop() {
     t++;
+    glowT += (glowCard ? 1 : -1) * 0.05;
+    glowT = Math.max(0, Math.min(1, glowT));
     ctx.clearRect(0, 0, cv.width, cv.height);
 
     // Rotate toward the white dot first (using current center position)

@@ -765,6 +765,57 @@ footer {
   opacity: 0.75;
 }
 
+/* Glowy team member card */
+.glowy-member-card {
+  margin-top: 1.8rem;
+  border: 1px solid var(--card-bd);
+  border-radius: 16px;
+  padding: 1.4rem 1.2rem 1.2rem;
+  background: var(--card-bg);
+  transition: border-color 0.4s ease, background 0.4s ease, box-shadow 0.4s ease;
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+}
+.glowy-member-card::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 70% 55% at 50% 25%, rgba(6,182,212,0.06) 0%, transparent 70%);
+  pointer-events: none;
+  transition: opacity 0.4s;
+}
+.glowy-member-card:hover {
+  border-color: rgba(6,182,212,0.35);
+  background: rgba(6,182,212,0.04);
+  box-shadow: 0 0 36px rgba(6,182,212,0.09), inset 0 0 24px rgba(6,182,212,0.04);
+}
+.glowy-member-art {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 0.9rem;
+}
+.glowy-member-art svg {
+  filter: drop-shadow(0 0 6px rgba(6,182,212,0.18));
+  transition: filter 0.5s ease;
+  animation: jellyCardBob 4s ease-in-out infinite;
+}
+.glowy-member-card:hover .glowy-member-art svg {
+  filter: drop-shadow(0 0 14px rgba(6,182,212,0.75)) drop-shadow(0 0 32px rgba(6,182,212,0.38));
+}
+@keyframes jellyCardBob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+.glowy-member-desc {
+  font-size: 0.76rem !important;
+  margin-top: 0.7rem !important;
+  margin-bottom: 0 !important;
+  color: var(--muted) !important;
+  font-style: italic;
+  line-height: 1.5 !important;
+  opacity: 0.75;
+}
+
 .daniel-text h2 { margin-bottom: 1.5rem; }
 .daniel-text p { margin-bottom: 1.2rem; }
 .daniel-text p em { color: var(--text); font-style: italic; }
