@@ -54,12 +54,20 @@
     ctx.clearRect(0, 0, w, h);
 
     // Ocean sunlight from top-right corner
-    const srcX = w * 0.87;
-    const srcY = h * -0.04;
+    // Source drifts like refraction through a moving water surface:
+    // slow wave (~9s) + fast ripple (~3s) on both axes
+    const srcX = w * 0.87
+               + Math.sin(t * 0.011) * w * 0.014
+               + Math.sin(t * 0.035 + 0.8) * w * 0.004;
+    const srcY = h * -0.04
+               + Math.sin(t * 0.011 + 1.3) * h * 0.009
+               + Math.sin(t * 0.031 + 2.1) * h * 0.003;
 
-    // Ambient halo at the light source
+    // Ambient halo — breathes with two overlapping frequencies
     const haloRad = Math.max(w, h) * 0.62;
-    const haloA = 0.042 + Math.sin(t * 0.0033) * 0.012;
+    const haloA = 0.040
+                + Math.sin(t * 0.013) * 0.013
+                + Math.sin(t * 0.031) * 0.006;
     const hg = ctx.createRadialGradient(srcX, srcY, 0, srcX, srcY, haloRad);
     hg.addColorStop(0,    `rgba(200,242,255,${haloA * 2.6})`);
     hg.addColorStop(0.14, `rgba(120,210,255,${haloA * 1.15})`);
@@ -68,17 +76,30 @@
     ctx.fillStyle = hg;
     ctx.fillRect(0, 0, w, h);
 
-    // Crepuscular rays fanning from top-right corner into the water
+    // Crepuscular rays — each ray has three additive motion components
+    // so they move independently like real refracted light paths
+    const rayLen = Math.max(w, h) * 1.65;
     const rayCount = 10;
     for (let i = 0; i < rayCount; i++) {
       const frac = i / (rayCount - 1);
+
+      // Angle: slow sweep (~8s) + medium ripple (~3.6s) + very slow drift (~15s)
       const baseAngle = (Math.PI * 0.57 + frac * Math.PI * 0.36)
-                      + Math.sin(t * 0.00033 + i * 1.18) * 0.048;
-      const rayLen = Math.max(w, h) * 1.65;
-      const halfW  = (1.0 + Math.sin(frac * Math.PI) * 4.5)
-                   + Math.sin(t * 0.00062 + i * 1.32) * 2.2;
-      const peakA  = 0.013 + 0.016 * Math.sin(frac * Math.PI);
-      const alpha  = peakA * (0.70 + 0.30 * Math.sin(t * 0.00050 + i * 0.90));
+                      + Math.sin(t * 0.013  + i * 1.18) * 0.10
+                      + Math.sin(t * 0.029  + i * 0.72) * 0.055
+                      + Math.sin(t * 0.007  + i * 2.05) * 0.028;
+
+      // Width: wide oscillation (~5.8s) + quick flutter (~2.5s)
+      const halfW = (1.0 + Math.sin(frac * Math.PI) * 4.5)
+                  + Math.sin(t * 0.018 + i * 1.32) * 3.8
+                  + Math.sin(t * 0.041 + i * 0.95) * 1.5;
+
+      // Intensity: caustic-like brightening (~7s primary + ~2.7s secondary)
+      const peakA = 0.013 + 0.016 * Math.sin(frac * Math.PI);
+      const alpha = peakA * (0.52
+                  + 0.34 * Math.sin(t * 0.015 + i * 0.90)
+                  + 0.14 * Math.sin(t * 0.038 + i * 1.48));
+
       const perpAng = baseAngle + Math.PI / 2;
       const px = Math.cos(perpAng), py = Math.sin(perpAng);
       const ex = srcX + Math.cos(baseAngle) * rayLen;
