@@ -119,7 +119,7 @@
 (function initWords() {
   const el = document.getElementById('rotatingWord');
   if (!el) return;
-  const words = ['scientists', 'athletes', 'artists', 'educators', 'musicians', 'creators', 'visionaries', 'philosophers', 'inspiring projects'];
+  const words = ['inspiring projects', 'scientists', 'athletes', 'artists', 'educators', 'musicians', 'creators'];
   let i = 0;
 
   setInterval(() => {
