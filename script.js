@@ -218,6 +218,7 @@
 
   function closeMenu() {
     links.classList.remove('open');
+    nav.classList.remove('nav-open');
     const s = toggle.querySelectorAll('span');
     s[0].style.transform = '';
     s[1].style.opacity   = '';
@@ -228,6 +229,7 @@
     const open = links.classList.toggle('open');
     const s = toggle.querySelectorAll('span');
     if (open) {
+      nav.classList.add('nav-open');
       s[0].style.transform = 'rotate(45deg) translate(5px,5px)';
       s[1].style.opacity   = '0';
       s[2].style.transform = 'rotate(-45deg) translate(5px,-5px)';
