@@ -801,11 +801,40 @@ footer {
 }
 .glowy-member-card:hover .glowy-member-art svg {
   filter: drop-shadow(0 0 14px rgba(6,182,212,0.75)) drop-shadow(0 0 32px rgba(6,182,212,0.38));
+  animation: jellyCardHappy 1s ease-in-out infinite;
 }
 @keyframes jellyCardBob {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-6px); }
 }
+@keyframes jellyCardHappy {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25%  { transform: translateY(-4px) rotate(-2.5deg); }
+  75%  { transform: translateY(-5px) rotate(2.5deg); }
+}
+@keyframes glowy-tail-wag {
+  0%, 100% { transform: rotate(0deg); }
+  25%      { transform: rotate(-10deg); }
+  75%      { transform: rotate(10deg); }
+}
+.glowy-member-card:hover .g-tail-1,
+.glowy-member-card:hover .g-tail-2,
+.glowy-member-card:hover .g-tail-3,
+.glowy-member-card:hover .g-tail-4,
+.glowy-member-card:hover .g-tail-5,
+.glowy-member-card:hover .g-tail-6,
+.glowy-member-card:hover .g-tail-7 {
+  transform-box: fill-box;
+  transform-origin: top center;
+  animation: glowy-tail-wag 1.2s ease-in-out infinite;
+}
+.glowy-member-card:hover .g-tail-1 { animation-delay: 0s; }
+.glowy-member-card:hover .g-tail-2 { animation-delay: 0.07s; }
+.glowy-member-card:hover .g-tail-3 { animation-delay: 0.14s; }
+.glowy-member-card:hover .g-tail-4 { animation-delay: 0.21s; }
+.glowy-member-card:hover .g-tail-5 { animation-delay: 0.28s; }
+.glowy-member-card:hover .g-tail-6 { animation-delay: 0.35s; }
+.glowy-member-card:hover .g-tail-7 { animation-delay: 0.42s; }
 .glowy-member-desc {
   font-size: 0.76rem !important;
   margin-top: 0.7rem !important;
