@@ -53,19 +53,46 @@
     t++;
     ctx.clearRect(0, 0, w, h);
 
-    // Subtle crepuscular light rays from above
-    for (let i = 0; i < 7; i++) {
-      const cx = w * ((i + 0.5) / 7) + Math.sin(t * 0.00035 + i * 1.25) * 55;
-      const sw = w * 0.048 + Math.sin(t * 0.00028 + i * 0.9) * 11;
-      const alpha = 0.022 + Math.sin(t * 0.0005 + i) * 0.01;
-      const g = ctx.createLinearGradient(cx, 0, cx, h * 0.72);
-      g.addColorStop(0, `rgba(55,135,225,${alpha})`);
-      g.addColorStop(1, 'rgba(55,135,225,0)');
+    // Ocean sunlight from top-right corner
+    const srcX = w * 0.87;
+    const srcY = h * -0.04;
+
+    // Ambient halo at the light source
+    const haloRad = Math.max(w, h) * 0.62;
+    const haloA = 0.042 + Math.sin(t * 0.0033) * 0.012;
+    const hg = ctx.createRadialGradient(srcX, srcY, 0, srcX, srcY, haloRad);
+    hg.addColorStop(0,    `rgba(200,242,255,${haloA * 2.6})`);
+    hg.addColorStop(0.14, `rgba(120,210,255,${haloA * 1.15})`);
+    hg.addColorStop(0.38, `rgba(50,155,240,${haloA * 0.38})`);
+    hg.addColorStop(1,    'rgba(20,95,210,0)');
+    ctx.fillStyle = hg;
+    ctx.fillRect(0, 0, w, h);
+
+    // Crepuscular rays fanning from top-right corner into the water
+    const rayCount = 10;
+    for (let i = 0; i < rayCount; i++) {
+      const frac = i / (rayCount - 1);
+      const baseAngle = (Math.PI * 0.57 + frac * Math.PI * 0.36)
+                      + Math.sin(t * 0.00033 + i * 1.18) * 0.048;
+      const rayLen = Math.max(w, h) * 1.65;
+      const halfW  = (1.0 + Math.sin(frac * Math.PI) * 4.5)
+                   + Math.sin(t * 0.00062 + i * 1.32) * 2.2;
+      const peakA  = 0.013 + 0.016 * Math.sin(frac * Math.PI);
+      const alpha  = peakA * (0.70 + 0.30 * Math.sin(t * 0.00050 + i * 0.90));
+      const perpAng = baseAngle + Math.PI / 2;
+      const px = Math.cos(perpAng), py = Math.sin(perpAng);
+      const ex = srcX + Math.cos(baseAngle) * rayLen;
+      const ey = srcY + Math.sin(baseAngle) * rayLen;
+      const g = ctx.createLinearGradient(srcX, srcY, ex, ey);
+      g.addColorStop(0,    `rgba(220,248,255,${alpha * 1.85})`);
+      g.addColorStop(0.20, `rgba(140,218,255,${alpha})`);
+      g.addColorStop(0.58, `rgba(60,165,242,${alpha * 0.40})`);
+      g.addColorStop(1,    'rgba(28,120,225,0)');
       ctx.beginPath();
-      ctx.moveTo(cx - sw, 0);
-      ctx.lineTo(cx + sw, 0);
-      ctx.lineTo(cx + sw * 3, h * 0.72);
-      ctx.lineTo(cx - sw * 3, h * 0.72);
+      ctx.moveTo(srcX + px * halfW,      srcY + py * halfW);
+      ctx.lineTo(srcX - px * halfW,      srcY - py * halfW);
+      ctx.lineTo(ex   - px * halfW * 20, ey   - py * halfW * 20);
+      ctx.lineTo(ex   + px * halfW * 20, ey   + py * halfW * 20);
       ctx.closePath();
       ctx.fillStyle = g;
       ctx.fill();
@@ -78,15 +105,28 @@
       b.y += b.vy;
       if (b.y < -12) Object.assign(b, newBubble(true));
 
+      // Sunlight reflection: bubbles closer to the source catch more light
+      const bdx = b.x - srcX, bdy = b.y - srcY;
+      const bDist = Math.sqrt(bdx * bdx + bdy * bdy);
+      const lit = Math.max(0, 1 - bDist / (Math.max(w, h) * 0.72)) * 0.6;
+
       ctx.beginPath();
       ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
-      ctx.strokeStyle = `rgba(140,210,255,${b.o})`;
+      ctx.strokeStyle = `rgba(140,210,255,${b.o + lit * 0.28})`;
       ctx.lineWidth = 1.0;
       ctx.stroke();
+      // Primary specular highlight
       ctx.beginPath();
       ctx.arc(b.x - b.r * 0.27, b.y - b.r * 0.3, b.r * 0.28, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(215,242,255,${b.o * 0.85})`;
+      ctx.fillStyle = `rgba(215,242,255,${b.o * 0.85 + lit * 0.38})`;
       ctx.fill();
+      // Secondary sun-catch sparkle on lit bubbles
+      if (lit > 0.12) {
+        ctx.beginPath();
+        ctx.arc(b.x + b.r * 0.20, b.y - b.r * 0.25, b.r * 0.14, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(240,252,255,${lit * 0.65})`;
+        ctx.fill();
+      }
     }
 
     // Bioluminescent plankton
