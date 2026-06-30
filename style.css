@@ -627,6 +627,8 @@ footer {
 .footer-legal { display: flex; gap: 1.4rem; flex-wrap: wrap; justify-content: center; }
 .footer-legal a { font-size: 0.78rem; color: var(--dim); transition: color var(--ease); }
 .footer-legal a:hover { color: var(--muted); }
+.footer-social-link { display: inline-flex; align-items: center; color: var(--dim); transition: color var(--ease); }
+.footer-social-link:hover { color: var(--muted); }
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 960px) {
