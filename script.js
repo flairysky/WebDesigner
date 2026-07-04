@@ -180,7 +180,9 @@
 (function initWords() {
   const el = document.getElementById('rotatingWord');
   if (!el) return;
-  const words = ['exciting projects', 'scientists', 'athletes', 'artists', 'educators', 'musicians', 'creators'];
+  const words = el.dataset.words
+    ? el.dataset.words.split('|')
+    : ['exciting projects', 'scientists', 'athletes', 'artists', 'educators', 'musicians', 'creators'];
   let i = 0;
 
   setInterval(() => {
