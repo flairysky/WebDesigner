@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "PowerShell(git ls-remote git@github.com-work:glowydesign/WebDesigner.git 2>&1)",
-      "PowerShell(git ls-remote git@github.com-work:glowydesign/glowydesign.github.io.git 2>&1)"
+      "PowerShell(git ls-remote git@github.com-work:glowydesign/glowydesign.github.io.git 2>&1)",
+      "Bash(ssh -T git@github.com-work)"
     ]
   }
 }
