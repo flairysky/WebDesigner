@@ -471,6 +471,11 @@ p { color: var(--muted); line-height: 1.8; }
   transform: translateY(-7px) scale(1.012);
   box-shadow: 0 30px 80px rgba(0,0,0,0.55);
 }
+.project-card-center {
+  grid-column: 1 / -1;
+  max-width: calc(50% - 0.75rem);
+  margin: 0 auto;
+}
 .card-bg {
   position: absolute; inset: 0;
   transition: transform 0.65s ease;
@@ -734,6 +739,7 @@ footer {
   .about-visual { order: -1; }
   .designer-frame { max-width: 420px; margin: 0 auto; }
   .projects-grid { grid-template-columns: 1fr; }
+  .project-card-center { max-width: 100%; }
   .client-types-grid { grid-template-columns: 1fr; }
   .faq-layout { grid-template-columns: 1fr; gap: 3rem; }
   .faq-header { position: static; }
