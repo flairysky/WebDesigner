@@ -972,15 +972,21 @@ footer {
 .glowy-member-art svg {
   filter: drop-shadow(0 0 6px rgba(6,182,212,0.18));
   transition: filter 0.5s ease;
-  animation: jellyCardBob 4s ease-in-out infinite;
+  offset-path: ellipse(26px 11px at 50% 50%);
+  offset-rotate: 0deg;
+  offset-distance: 0%;
+  animation: glowySwim 15s linear infinite, jellyCardBob 5s ease-in-out infinite;
 }
 .glowy-member-card:hover .glowy-member-art svg {
   filter: drop-shadow(0 0 14px rgba(6,182,212,0.75)) drop-shadow(0 0 32px rgba(6,182,212,0.38));
-  animation: jellyCardHappy 1s ease-in-out infinite;
+  animation: glowySwim 15s linear infinite, jellyCardHappy 1s ease-in-out infinite;
+}
+@keyframes glowySwim {
+  100% { offset-distance: 100%; }
 }
 @keyframes jellyCardBob {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-5px) rotate(2deg); }
 }
 @keyframes jellyCardHappy {
   0%, 100% { transform: translateY(0) rotate(0deg); }
@@ -992,6 +998,23 @@ footer {
   25%      { transform: rotate(-10deg); }
   75%      { transform: rotate(10deg); }
 }
+@keyframes glowy-tail-sway {
+  0%, 100% { transform: rotate(0deg); }
+  25%      { transform: rotate(-3.5deg); }
+  75%      { transform: rotate(3.5deg); }
+}
+.g-tail-1, .g-tail-2, .g-tail-3, .g-tail-4, .g-tail-5, .g-tail-6, .g-tail-7 {
+  transform-box: fill-box;
+  transform-origin: top center;
+  animation: glowy-tail-sway 3s ease-in-out infinite;
+}
+.g-tail-1 { animation-delay: 0s; }
+.g-tail-2 { animation-delay: 0.18s; }
+.g-tail-3 { animation-delay: 0.36s; }
+.g-tail-4 { animation-delay: 0.54s; }
+.g-tail-5 { animation-delay: 0.72s; }
+.g-tail-6 { animation-delay: 0.9s; }
+.g-tail-7 { animation-delay: 1.08s; }
 .glowy-member-card:hover .g-tail-1,
 .glowy-member-card:hover .g-tail-2,
 .glowy-member-card:hover .g-tail-3,
