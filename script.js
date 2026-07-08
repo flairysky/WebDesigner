@@ -481,6 +481,40 @@
 })();
 
 
+/* ===== GLOWY FOLLOWS THE CURSOR ===== */
+(function initGlowyFollow() {
+  const card = document.getElementById('glowCard');
+  const frame = card && card.querySelector('.glowy-porthole-frame');
+  if (!card || !frame) return;
+
+  const maxFollow = 16; // px — keeps her inside the porthole window
+
+  function handleMove(e) {
+    const rect = frame.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    let dx = e.clientX - cx;
+    let dy = e.clientY - cy;
+    const dist = Math.hypot(dx, dy);
+    if (dist > maxFollow) {
+      const scale = maxFollow / dist;
+      dx *= scale;
+      dy *= scale;
+    }
+    card.style.setProperty('--fx', dx.toFixed(1) + 'px');
+    card.style.setProperty('--fy', dy.toFixed(1) + 'px');
+  }
+
+  function reset() {
+    card.style.setProperty('--fx', '0px');
+    card.style.setProperty('--fy', '0px');
+  }
+
+  card.addEventListener('mousemove', handleMove);
+  card.addEventListener('mouseleave', reset);
+})();
+
+
 /* ===== SMOOTH SCROLL ===== */
 document.querySelectorAll('a[href^="#"]').forEach(a => {
   a.addEventListener('click', e => {

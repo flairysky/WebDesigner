@@ -982,6 +982,11 @@ footer {
   );
   mix-blend-mode: screen;
 }
+.glowy-follow {
+  transform: translate(var(--fx, 0px), var(--fy, 0px));
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
 .glowy-member-art svg {
   filter: drop-shadow(0 0 6px rgba(6,182,212,0.18));
   transition: filter 0.5s ease;
