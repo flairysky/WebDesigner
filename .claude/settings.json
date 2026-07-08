@@ -3,7 +3,18 @@
     "allow": [
       "PowerShell(git ls-remote git@github.com-work:glowydesign/WebDesigner.git 2>&1)",
       "PowerShell(git ls-remote git@github.com-work:glowydesign/glowydesign.github.io.git 2>&1)",
-      "Bash(ssh -T git@github.com-work)"
+      "Bash(ssh -T git@github.com-work)",
+      "WebSearch",
+      "Bash(curl -s -A \"Mozilla/5.0 \\(Windows NT 10.0; Win64; x64\\) AppleWebKit/537.36 \\(KHTML, like Gecko\\) Chrome/124.0 Safari/537.36\" \"https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Inter:wght@300;400;500;600;700&display=swap\")",
+      "Bash(grep -B3 \"/\\\\* latin \\\\*/\" -A0 \"C:\\\\Users\\\\dnadr\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-dnadr-OneDrive-desktop-Github-Pull-WebDesigner\\\\1be5b366-35cb-449d-b744-fbb152d07e24\\\\scratchpad\\\\fonts.css\")",
+      "Bash(grep -A7 \"/\\\\* latin \\\\*/\" \"C:\\\\Users\\\\dnadr\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-dnadr-OneDrive-desktop-Github-Pull-WebDesigner\\\\1be5b366-35cb-449d-b744-fbb152d07e24\\\\scratchpad\\\\fonts.css\")",
+      "Bash(mkdir -p \"c:/Users/dnadr/OneDrive/desktop/Github Pull/WebDesigner/Assets/Fonts\")",
+      "Bash(curl -s -o \"c:/Users/dnadr/OneDrive/desktop/Github Pull/WebDesigner/Assets/Fonts/inter-latin.woff2\" \"https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2\")",
+      "Bash(curl -s -o \"c:/Users/dnadr/OneDrive/desktop/Github Pull/WebDesigner/Assets/Fonts/playfair-display-latin.woff2\" \"https://fonts.gstatic.com/s/playfairdisplay/v40/nuFiD-vYSZviVYUb_rj3ij__anPXDTzYgA.woff2\")",
+      "Bash(curl -s -o \"c:/Users/dnadr/OneDrive/desktop/Github Pull/WebDesigner/Assets/Fonts/playfair-display-italic-latin.woff2\" \"https://fonts.gstatic.com/s/playfairdisplay/v40/nuFRD-vYSZviVYUb_rj3ij__anPXDTnCjmHKM4nYO7KN_k-UXtHA-Q.woff2\")",
+      "Bash(python -m http.server 8791)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:8791/index.html)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:8791/Assets/Fonts/inter-latin.woff2)"
     ]
   }
 }

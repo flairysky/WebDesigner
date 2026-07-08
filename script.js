@@ -529,6 +529,7 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
 /* ===== COOKIE CONSENT & MICROSOFT CLARITY ===== */
 (function initCookieConsent() {
   function loadClarity() {
+    if (window.clarity) return;
     (function(c,l,a,r,i,t,y){
       c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
       t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
@@ -536,32 +537,51 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
     })(window, document, "clarity", "script", "xe32t6hxx2");
   }
 
+  function clearClarityCookies() {
+    ['_clck', '_clsk'].forEach(function (name) {
+      document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    });
+  }
+
   var banner = document.getElementById('cookieBanner');
   var acceptBtn = document.getElementById('cookieAccept');
   var rejectBtn = document.getElementById('cookieReject');
+  var settingsLink = document.getElementById('cookieSettingsLink');
   var consent = localStorage.getItem('cookieConsent');
 
-  if (consent === 'accepted') {
-    loadClarity();
-    if (banner) banner.classList.add('hidden');
-    return;
+  if (consent === 'accepted') loadClarity();
+
+  // A "Cookie Settings" link on other pages sends visitors here with ?cookies=1
+  // so they can reopen the banner even after already making a choice.
+  var forceOpen = /[?&]cookies=1(&|$)/.test(window.location.search);
+  if (forceOpen) {
+    window.history.replaceState(null, '', window.location.pathname + window.location.hash);
   }
 
-  if (consent === 'rejected') {
-    if (banner) banner.classList.add('hidden');
-    return;
+  if (banner) {
+    banner.classList.toggle('hidden', !forceOpen && !!consent);
   }
 
-  if (!banner) return;
+  if (acceptBtn) {
+    acceptBtn.addEventListener('click', function () {
+      localStorage.setItem('cookieConsent', 'accepted');
+      banner.classList.add('hidden');
+      loadClarity();
+    });
+  }
 
-  acceptBtn.addEventListener('click', function () {
-    localStorage.setItem('cookieConsent', 'accepted');
-    banner.classList.add('hidden');
-    loadClarity();
-  });
+  if (rejectBtn) {
+    rejectBtn.addEventListener('click', function () {
+      localStorage.setItem('cookieConsent', 'rejected');
+      banner.classList.add('hidden');
+      clearClarityCookies();
+    });
+  }
 
-  rejectBtn.addEventListener('click', function () {
-    localStorage.setItem('cookieConsent', 'rejected');
-    banner.classList.add('hidden');
-  });
+  if (settingsLink) {
+    settingsLink.addEventListener('click', function (e) {
+      e.preventDefault();
+      if (banner) banner.classList.remove('hidden');
+    });
+  }
 })();
