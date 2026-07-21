@@ -1309,3 +1309,11 @@ footer        { background: rgba(3,10,24,0.93) !important; }
   .cookie-banner-inner { flex-direction: column; align-items: flex-start; }
   .cookie-actions { width: 100%; justify-content: flex-end; }
 }
+
+/* Firefox-only: grid item's automatic min-width:auto lets the testimonial
+   card overflow its track on narrow screens instead of shrinking. */
+@supports (-moz-appearance: none) {
+  @media (max-width: 760px) {
+    .testimonial-card { min-width: 0; }
+  }
+}
